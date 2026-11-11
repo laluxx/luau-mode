@@ -17,6 +17,7 @@
 (require 'seq)
 (require 'subr-x)
 (require 'luau-roblox)
+(require 'luau-interface)
 
 (declare-function lsp-register-client "lsp-mode")
 (declare-function make-lsp-client "lsp-mode")
@@ -213,13 +214,25 @@ These are translated to `--definitions:@NAME=FILE' arguments."
                       (car entry) (expand-file-name (cdr entry))))
             files)))
 
+(defun luau-lsp--roblox-arguments ()
+  "Get Roblox API arguments, repairing a stale already-loaded API module.
+Some users reload Luau Mode between development cycles while an older
+`luau-roblox' feature is still loaded.  The command must not call a missing
+function from that outdated in-memory feature."
+  (unless (fboundp 'luau-roblox-api-arguments)
+    (when-let* ((source (locate-library "luau-roblox.el")))
+      (load source nil 'nomessage)))
+  (unless (fboundp 'luau-roblox-api-arguments)
+    (user-error "Roblox API module is stale: reload luau-roblox.el or restart Emacs"))
+  (luau-roblox-api-arguments))
+
 (defun luau-lsp--validated-command ()
   "Return the current stdio command, or raise an actionable error."
   (unless (luau-lsp--command-executable-p luau-lsp-command)
     (user-error "Luau LSP unavailable: customize `luau-lsp-command' (%S)"
                 luau-lsp-command))
   (append (copy-sequence luau-lsp-command)
-          (luau-roblox-api-arguments)
+          (luau-lsp--roblox-arguments)
           (luau-lsp--definitions)))
 
 (defun luau-lsp--preferred-backend ()
@@ -390,6 +403,21 @@ Both Eglot and lsp-mode are supported, but only one runs per buffer."
                   (gethash (substring (symbol-name key) 1) object))))
         ((listp object) (plist-get object key))))
 
+(defvar luau-lsp--workspace-candidates nil
+  "Dynamically bound completion candidates for workspace symbol annotations.")
+
+(defun luau-lsp--workspace-annotation (candidate)
+  "Return the type of workspace variable CANDIDATE for completion UIs.
+This standard completion annotation also works with optional Marginalia
+without loading or modifying the Marginalia package."
+  (when-let* ((entry (assoc candidate luau-lsp--workspace-candidates)))
+    (propertize
+     (format "  %-9s"
+             (pcase (nth 3 (cdr entry))
+               (7 "property") (8 "field")
+               (13 "variable") (14 "constant") (_ "symbol")))
+     'face 'luau-interface-symbol-kind-face)))
+
 (defun luau-lsp--select-workspace-variable (symbols)
   "Select a source variable from LSP SYMBOLS and navigate to its definition.
 Accept both JSON-RPC vectors and lists using the same representation."
@@ -410,13 +438,20 @@ Accept both JSON-RPC vectors and lists using the same representation."
                      (when (and (memq kind '(7 8 13 14))
                                 (stringp name) path
                                 (natnump line) (natnump column))
-                       (cons (format "%s — %s:%d"
-                                     name (file-relative-name path root) (1+ line))
-                             (list path line column)))))
+                       (cons (concat
+                              (propertize name 'face 'luau-interface-symbol-kind-face)
+                              (propertize
+                               (format "  %s:%d"
+                                       (file-relative-name path root) (1+ line))
+                               'face 'luau-interface-imenu-location-face))
+                             (list path line column kind)))))
                  (append symbols nil)))))
     (unless candidates
       (user-error "Luau LSP returned no navigable workspace variable symbols"))
-    (let* ((selection (completing-read "Luau project variable: " candidates nil t))
+    (let* ((luau-lsp--workspace-candidates candidates)
+           (completion-extra-properties
+            (list :annotation-function #'luau-lsp--workspace-annotation))
+           (selection (completing-read "Luau project variable: " candidates nil t))
            (entry (cdr (assoc selection candidates))))
       (luau--lsp-position (nth 0 entry) (nth 1 entry) (nth 2 entry)))))
 

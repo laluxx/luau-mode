@@ -40,7 +40,7 @@ values fail closed instead of accidentally disabling any check."
    (t (user-error "Unknown LUAU_DOCTOR_CHECKS: %s" choice))))
 
 (defcustom luau-doctor-distributed-sources
-  '("luau-mode.el" "luau-lsp.el" "luau-roblox.el" "luau-make.el")
+  '("luau-mode.el" "luau-lsp.el" "luau-roblox.el" "luau-make.el" "luau-interface.el")
   "Top-level distribution files to validate with `package-lint'.
 Development scripts under test/, tests/, bench/, and tools/ are checked
 recursively by Checkdoc and the Make test/compile gates instead."

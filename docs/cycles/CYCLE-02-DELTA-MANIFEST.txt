@@ -1,0 +1,16 @@
+ADDED  ae8c6e55d670c4be8f6edaa7ea913a6a772a2bdbf605ab23a91da1a772a8612f  luau-mode/.gitignore
+MODIFIED  a2020f2234b03743d998f1af46bc531158ffe828259ea8eb756e70b44ec58edd  luau-mode/Makefile
+MODIFIED  02ff18232ccc1e4521ffba013bf6caf82cc7dd4bcc500b8cb568b117e97e6c22  luau-mode/README.md
+ADDED  1cd40fbfbfb0c02799ca76a0cf987c7e7d279393feb0bff893551b7af635c6b5  luau-mode/bench/font-lock-perf.el
+ADDED  c6e615aaf11fe6ddd0dddf956b6f62efda706461aebcf0450c173e35a029dc1a  luau-mode/bench/navigation-perf.el
+ADDED  6bb30201ad619344469e6457bad6b11bda45ec84c11aeb0a0da90f805aaeb5bf  luau-mode/docs/CYCLE-02.org
+ADDED  881c4340c9ae2a444aa5a1de43c7b1eb8f4d6b582450684778287329976ab9c0  luau-mode/luau-lsp.el
+MODIFIED  d9387ddee69d45314881bf0cf23ea441c85fca847ff7a7b4768d2c450031524a  luau-mode/luau-mode.el
+ADDED  3328022b1d2a45a9e1b188cfc285a2f5b23931412a2ce1adf93e0c70cd64b839  luau-mode/test/batch-doctor.el
+ADDED  d1a6ae44578b04b060efafbed5601bf56c8da4ff483fc968b06703df72e577d0  luau-mode/test/batch-ert.el
+ADDED  030a1cd422f5d7f3218915ccd5d9ca1ec4d83a69438363b2f26758b610e693aa  luau-mode/test/luau-doctor.el
+ADDED  d72f7d1ebe35e18e3242a20b07d681f54c927bae83ae52b405db402140bab44c  luau-mode/test/luau-lsp-test.el
+ADDED  38ba2e45c2ae7e215eadf25bb008d1f1663be5da058c3b09ae335f4bcf9b1559  luau-mode/tools/make_ui.py
+ADDED  19855e7d4d9af0a953cd76c82c212343f008e08726b1f898ddfee7bcbd3e7b4f  luau-mode/tools/test_make_ui.py
+ADDED  75159c65464853554959809e120814db8ac2095a75d3f38cfa33c42f9fb739f3  luau-mode/tools/test_verify_delta.py
+ADDED  80feba32e2f55e4adbc5e513cf7f6fcc1116674241bff651bbcf33525d89b9f7  luau-mode/tools/verify_delta.py

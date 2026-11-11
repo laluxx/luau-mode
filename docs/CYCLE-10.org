@@ -1,0 +1,60 @@
+#+title: Luau Mode — Cycle 10
+#+author: laluxx
+
+* Scope
+
+This cycle integrates a standalone structural editor UI inspired by Monad Mode,
+fixes the stale Roblox API argument function failure, and preserves the single
+=make check= quality entry.  No Monad parser or runtime code is required.
+
+* Source navigation
+
+- Flat Imenu index with buffer-tick cache, source-order markers and colored faces
+  for functions, type declarations and module requires.
+- Interactive =luau-imenu= (C-c C-j) shows parameter signatures, one-line doc
+  comment previews and line locations through the standard completion
+  annotation protocol.  Marginalia, Vertico and other completion packages
+  remain optional.
+- Buffer-local C-h v lists workspace *source* symbols with colored names,
+  relative locations and variable/field/constant/property annotations.
+
+* Echo-area signatures
+
+- =luau-interface-eldoc= displays locally declared function parameter lists.
+- The current argument inherits =region=; inactive arguments inherit =shadow=.
+- The documentation value is cached by buffer modification tick and point.
+- LSP hover continues to be available on C-c C-k.
+
+* Keyword highlighting
+
+- =luau-interface-match-face= inherits =region=.
+- Nested function/if/for/while/do/repeat blocks are paired with end/until.
+- Branch keywords (then/else/elseif and loop do) resolve to their closing end.
+- Comments and strings are excluded; only a keyword at point triggers scans.
+- The entire service is opt-out via =luau-interface-highlight-matching-keywords=.
+
+* Roblox Studio API help
+
+- C-c C-o explicitly opens official Roblox Creator Hub reference URLs.
+- By default =eww= displays the online documentation inside Emacs.
+- =luau-roblox-docs-browser= can be set to =browse-url= for a JavaScript browser.
+- Explicit symbol categories are customizable; unknown classes are not guessed.
+- Installed Roblox definitions are still controlled by =luau-roblox-api-install=
+  and propagated to luau-lsp through the CLI arguments.
+
+* Safety and verification
+
+- Recovery code addresses stale in-memory =luau-roblox= modules after reloads.
+- =test-interface= adds isolated ERT verification to =make check=.
+- =test-install= checks the new public module inside the installed package.
+- The generated package descriptor skips unnecessary byte-compilation, while
+  keeping the required single =define-package= Lisp form.
+- Python tooling, static structure and source audits are independently tested.
+
+* Local validation
+
+  make check
+
+The suite generates one complete TAR.GZ report.  Native Emacs, installed-client
+LSP and live Studio/Rojo integration results cannot be asserted until checked
+in the user's Emacs 32 environment.

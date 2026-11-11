@@ -39,6 +39,7 @@
   "Classify ERT test NAME for the headless overview."
   (cond ((string-prefix-p "luau-lsp-test-" name) "LSP / Rojo")
         ((string-prefix-p "luau-test-" name) "Editor baseline")
+        ((string-prefix-p "luau-interface-test-" name) "Structural UI")
         (t "Other tooling")))
 
 (defun luau-tests--print-inventory (selector)
@@ -49,7 +50,7 @@
                     (symbol-name (ert-test-name test)))))
         (puthash group (1+ (gethash group counts 0)) counts)))
     (princ "  Coverage by test family:\n")
-    (dolist (group '("Editor baseline" "LSP / Rojo" "Other tooling"))
+    (dolist (group '("Editor baseline" "LSP / Rojo" "Structural UI" "Other tooling"))
       (when (> (gethash group counts 0) 0)
         (princ (format "    %-22s %5d tests\n"
                        group (gethash group counts 0)))))))

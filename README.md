@@ -1,5 +1,25 @@
 # Luau Mode — independent Emacs major mode
 
+### Cycle 11 installation / source identity
+
+If your `make check` still displays **16 checks**, you are running Cycle 09,
+not this package. Cycle 11 runs **17** checks, including `test-interface`.
+The header also prints **Package 0.9.1 | Cycle 11** (actual local source data).
+
+For a complete checkout replacement, run this from your shell after downloading
+`luau-mode-cycle-11-full.tar.gz` (do not extract inside `luau-mode/`):
+
+```sh
+tar -xzf /path/to/luau-mode-cycle-11-full.tar.gz -C ~/.config/emacs/lisp/
+cd ~/.config/emacs/lisp/luau-mode
+make check
+```
+
+Restart Emacs to clear any previously loaded `.el`/`.elc` definitions. The
+archive never erases existing local files or your Emacs init settings.
+Existing `.elc` files are cleared by the compilation checks.
+
+
 **Author:** laluxx  
 **License:** GPL-3.0-or-later  
 **Emacs:** 31.1+ (Lua core uses Emacs 31 rx forms)  
@@ -169,7 +189,7 @@ cd ~/path/to/luau-mode
 make check
 ```
 
-This runs the *complete* non-destructive quality matrix (15 independent tasks, including dependency bootstrap, both compilation modes, all ERT suites, Checkdoc, package-lint, offline audits and benchmarks), continues after individual failures, and **always** creates one shareable archive under `.build/luau-make-report-*.tar.gz`. The archive contains complete logs, machine info, a JSON/JUnit report and hashes of the current source so the next development cycle can match results to code exactly. The command deliberately exits nonzero if any check failed. Upload the TAR.GZ for the next cycle; the logs are complete and no results are falsely marked as passed.
+This runs the *complete* non-destructive quality matrix (16 independent tasks, including dependency bootstrap, both compilation modes, all ERT suites, Checkdoc, package-lint, offline audits and benchmarks), continues after individual failures, and **always** creates one shareable archive under `.build/luau-make-report-*.tar.gz`. The archive contains complete logs, machine info, a JSON/JUnit report and hashes of the current source so the next development cycle can match results to code exactly. The command deliberately exits nonzero if any check failed. Upload the TAR.GZ for the next cycle; the logs are complete and no results are falsely marked as passed.
 
 Other useful commands:
 
@@ -177,6 +197,7 @@ Other useful commands:
 make help                 # discover targets and output controls
 make quickcheck           # strict compile, ERT, doctor, Python and static checks
 make check                # ONE command: all gates and diagnostic TAR.GZ
+make test-install         # isolated package.el install, autoload and face smoke test
 make test                 # all recursive ERT tests
 make test-lsp             # lsp-mode and Eglot regression tests only
 make compile-strict       # byte-compile; warnings fail the build
@@ -202,6 +223,29 @@ failures and remain in the archived report, never converted to skips.
 The Make runner uses the same styled, color-consistent stdout/stderr conventions as Monad Mode and preserves source `file:line` errors. ANSI colors are emitted for terminals by default; `M-x luau-make-check` enables a color-aware Emacs compilation buffer. Set `LUAU_COLOR=always` to force colors or `LUAU_ASCII=1` for plain status glyphs; full per-step logs, a JSON report, and JUnit XML remain under `.build/reports/`.
 
 **Package-lint is mandatory for `make doctor`.** `make check` first bootstraps package-lint into the isolated `.packages` directory when missing (network access on the first run), then runs the doctor. If the installation fails (for example offline), the failure is included in the final bundle, and no check is falsely marked as passed. `make doctor` alone still fails closed if package-lint is unavailable. No network is needed for `make test-tools` or `make test-static`.
+
+### Cycle 09 — installed-package validation
+
+This cycle adds a real `package.el` multi-file archive as a local **test
+fixture**, using Emacs' documented `NAME-VERSION.tar` layout. The archive
+includes `luau-mode-pkg.el`, the four public modules, README, and GPL license;
+it deliberately excludes ERT tests, developer tools, benchmarks, caches,
+bytecode and Rojo source files.
+
+`make check` runs `test-install` after strict compilation: the command builds
+`.build/release/luau-mode-0.9.0.tar` from the source Version and
+Package-Requires headers, installs it using `package-install-file` into an
+isolated temporary Emacs profile, and validates generated `.luau` autoloads,
+module loading from the installed directory, syntax faces and key bindings.
+The test performs no network requests, and cleans its temporary profile.
+If installation fails, **the whole quality matrix fails**; it is not
+silently skipped. Offline Python tests also validate deterministic archives
+and reject missing files, symlinks or malformed package metadata.
+
+The builder is a local package smoke fixture, *not* a replacement for MELPA's
+own package-build process. The existing `URL: https://luau.org` header refers
+to the Luau language site, **not an owner-controlled repository**. Replace it
+with the actual project homepage before submitting a MELPA recipe.
 
 ### Validation status of this archive
 
@@ -315,3 +359,42 @@ MELPA publication. A verified public repository URL is still needed.
   package repository URL before MELPA submission.
 - Each font-lock matcher performs syntax lookups without changing the search
   cursor or regexp match data. `make check` is still the only full native gate.
+
+## Cycle 10 — Structural UI and Roblox reference
+
+The standalone `luau-interface.el` module adapts the best isolated interaction
+ideas from laluxx's Monad Mode without using its parser or depending on Monad.
+Its cached Imenu index lists functions, exported types and `require` bindings in
+source order.  Use `C-c C-j` for the colored declaration picker; ordinary
+`M-x imenu` also uses the index.  Annotations include the type signature and
+the immediately preceding `---` documentation comment when available.
+`completion-extra-properties` supplies the standard annotation function, so
+Vertico and Marginalia can present the metadata without either being required.
+
+When the cursor is inside a call to a locally indexed function, Eldoc shows its
+parameter list and emphasizes the current parameter.  This fallback coexists
+with server-provided LSP hovers (`C-c C-k`).  Matching control-flow keywords
+(`function`/`if`/`for`/`while`/`do`/`repeat` and `end`/`until`) use the
+`luau-interface-match-face` (inherits `region`) and
+`luau-interface-match-current-face`.  Both services can be disabled using
+`M-x customize-group RET luau-interface RET`.
+
+`C-c C-o` opens the **live Roblox Creator Hub** reference for the symbol at
+point.  The default `luau-roblox-docs-browser` is `eww`, keeping the reference
+inside Emacs; customize it to `browse-url` for full JavaScript rendering.
+Known Roblox types (`Vector3`, `CFrame`), services (`Workspace`) and enums
+resolve to their documented category; unknown symbols require a user-selected
+reference category rather than guessing a possibly invalid URL.  This
+on-demand browser command does **not** download or update API definition files.
+Use `M-x luau-roblox-api-install` for explicit cached type definitions and
+`M-x luau-lsp-restart` to apply them to the external language server.
+
+`C-h v` is a buffer-local Luau source-symbol browser while in Luau Mode.  It
+shows **workspace source declarations**, not live Studio variables, and
+requires a connected LSP.  Its completion candidates and annotations use
+standard Emacs minibuffer APIs; installing Marginalia is optional.
+
+This cycle adds `test-interface` to the canonical `make check` suite.  The
+Roblox/LSP integration still requires a live Studio/Rojo project to verify
+server-specific API availability; passing mock tests alone is not proof of a
+working server connection.

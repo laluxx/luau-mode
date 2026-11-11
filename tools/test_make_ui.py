@@ -63,6 +63,27 @@ class DiagnosticsParsingTests(unittest.TestCase):
         self.assertTrue(any("make: ***" in x for x in excerpt))
 
 
+    def test_source_identity_reports_actual_checkout(self):
+        """Never mistake a stale source tree for a newer release cycle."""
+        with tempfile.TemporaryDirectory(prefix="luau-source-identity-") as temp:
+            root = Path(temp)
+            (root / "docs").mkdir()
+            (root / "luau-mode.el").write_text(
+                ";;; luau-mode.el --- Editor\n;; Version: 0.9.1\n")
+            (root / "docs/CYCLE-09.org").write_text("old")
+            (root / "docs/CYCLE-11.org").write_text("current")
+            (root / "docs/CYCLE-unrelated.org").write_text("not a cycle")
+            info = make_ui.machine_info(root)
+            self.assertEqual(info["package_version"], "0.9.1")
+            self.assertEqual(info["development_cycle"], 11)
+
+    def test_missing_source_identity_is_explicit(self):
+        """Synthetic checkout tests must not invent a version or cycle."""
+        with tempfile.TemporaryDirectory(prefix="luau-unknown-source-") as temp:
+            info = make_ui.machine_info(Path(temp))
+            self.assertIsNone(info["package_version"])
+            self.assertIsNone(info["development_cycle"])
+
     def test_status_colors_and_visible_width_remain_consistent(self):
         """Color escapes must never steal space from aligned CLI columns."""
         opts = make_ui.Options(Path.cwd(), ("make",), 5.0, False, True, False, 0)

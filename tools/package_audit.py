@@ -11,7 +11,8 @@ MODE = (ROOT / 'luau-mode.el').read_text(encoding='utf-8')
 LSP = (ROOT / 'luau-lsp.el').read_text(encoding='utf-8')
 MAKE = (ROOT / 'luau-make.el').read_text(encoding='utf-8')
 ROBLOX = (ROOT / 'luau-roblox.el').read_text(encoding='utf-8')
-SOURCES = MODE + '\n' + LSP + '\n' + MAKE + '\n' + ROBLOX
+INTERFACE = (ROOT / 'luau-interface.el').read_text(encoding='utf-8')
+SOURCES = MODE + '\n' + LSP + '\n' + MAKE + '\n' + ROBLOX + '\n' + INTERFACE
 
 
 def names(kind: str) -> list[str]:
@@ -34,6 +35,29 @@ def main() -> int:
         'Customizable language-server command': 'defcustom luau-lsp-command' in LSP,
         'Explicit Roblox API download only': '(defun luau-roblox-api-install' in ROBLOX and '(luau-roblox-api-install)' not in LSP,
         'Roblox API cache wired to LSP': '(luau-roblox-api-arguments)' in LSP,
+        'Roblox API runtime recovery':
+        'defun luau-lsp--roblox-arguments' in LSP
+        and '(luau-lsp--roblox-arguments)' in LSP,
+        'Live Creator Hub documentation command':
+        'defun luau-roblox-doc-at-point' in ROBLOX
+        and '(kbd "C-c C-o")' in MODE,
+        'Standalone annotated Imenu and Eldoc':
+        'defun luau-interface-imenu-annotate' in INTERFACE
+        and 'defun luau-interface-eldoc' in INTERFACE,
+        'Matching region inherited face':
+        "(defface luau-interface-match-face" in INTERFACE
+        and "'((t :inherit region))" in INTERFACE,
+        'New UI checks routed through make check':
+        'test-interface' in (ROOT / 'Makefile').read_text()
+        and 'test-interface' in (ROOT / 'tools/make_ui.py').read_text(),
+        'Isolated package distribution includes interface':
+        '"luau-interface.el"' in (ROOT / 'tools/build_release.py').read_text(),
+        'Checkdoc compliant installation message':
+        '(error "Package.el did not install luau-mode")' in
+        (ROOT / 'test/batch-package-install.el').read_text(encoding='utf-8'),
+        'Make check reports installed source cycle':
+        'development_cycle' in (ROOT / 'tools/make_ui.py').read_text(encoding='utf-8')
+        and 'package_version' in (ROOT / 'tools/make_ui.py').read_text(encoding='utf-8'),
         'Roblox API status declaration':
         '(declare-function luau-roblox-api-status "luau-roblox" ())' in MODE,
         'Roblox auxiliary module has no ineffective Package-Requires':

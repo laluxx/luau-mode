@@ -1,0 +1,12 @@
+Cycle 09 strict incremental manifest (relative to Cycle 08 full archive).
+Each file is SHA-256 checked; apply only over Cycle 08.
+
+MODIFIED  51ab8aa6e88520b07817e9cc9963b9489d3918fad296548e7f90728c3dba97b7  luau-mode/Makefile
+MODIFIED  6ff3080d9e9f88ef82d2ed62dcbf12e55a7925e13e45e9a3bf4dc853954945db  luau-mode/README.md
+ADDED  61801f66b4f00dfcd85e3cac5f83bcf53196fefa96f13a9032e4c0b54fad19b3  luau-mode/docs/CYCLE-09.org
+MODIFIED  f11303c2f579f1ff1f354e0d6cddba579701eefaa1505b1436955011293e79ef  luau-mode/docs/MELPA-READINESS.md
+MODIFIED  ab0514d334ace17fbbbe43e07bcd39eabaefeac922b0623b5c4a6bff1c4a174c  luau-mode/luau-mode.el
+ADDED  c5d4015a3108836681ea2624a7e7981326ab9dc17ef39f0924ebd9ee333382a5  luau-mode/test/batch-package-install.el
+ADDED  136f2ad4adb8f66066255cd0522565ca3d9ec1e293bef29bb8a16a255f251a09  luau-mode/tools/build_release.py
+MODIFIED  cde0e86a4ed400b0f1f3e50092b784645f04eca152e4f99687daf9f7e3e53dbb  luau-mode/tools/make_ui.py
+ADDED  44671e1b3f38860b56e6d9387c7efb8094fba5a7a6d50fa5ca0d7625ff0ade5a  luau-mode/tools/test_build_release.py

@@ -7,9 +7,9 @@ PYTHON ?= python3
 LUAU_MAKE ?= make
 MAKE_UI = $(PYTHON) tools/make_ui.py
 ELISP = $(shell find . -type f -name '*.el' ! -path './.git/*' ! -path './.packages/*' ! -path './test/*' ! -path './tests/*' ! -path './bench/*' ! -path './.build/*' | sort)
-TASKS = dependencies test test-core test-lsp test-font-lock test-tools test-static package-audit verify-delta compile compile-strict doctor checkdoc package-lint lint bootstrap clean clean-bytecode benchmark-font-lock benchmark-navigation
+TASKS = dependencies test-install test test-core test-lsp test-font-lock test-interface test-tools test-static package-audit verify-delta compile compile-strict doctor checkdoc package-lint lint bootstrap clean clean-bytecode benchmark-font-lock benchmark-navigation
 BENCHMARKS = benchmark-font-lock benchmark-navigation
-DIAGNOSTICS = dependencies compile compile-strict test test-core test-lsp test-font-lock doctor checkdoc package-lint test-tools test-static package-audit $(BENCHMARKS)
+DIAGNOSTICS = dependencies compile compile-strict test-install test test-core test-lsp test-font-lock test-interface doctor checkdoc package-lint test-tools test-static package-audit $(BENCHMARKS)
 .DEFAULT_GOAL := check
 .PHONY: all check quickcheck triage failures dashboard history trend status benchmark diagnostics diagnostics-bundle bundle help clean-reports $(TASKS) $(addprefix __raw-,$(TASKS))
 
@@ -44,6 +44,10 @@ clean-reports:
 	@rm -rf .build/reports
 
 # Private targets: raw logs are owned by one instrumented public target.
+__raw-test-install:
+	@$(PYTHON) tools/build_release.py
+	@LUAU_RELEASE_TAR="$$($(PYTHON) tools/build_release.py --print-path)" $(EMACS) -Q --batch -l test/batch-package-install.el
+
 __raw-test:
 	@EMACS='$(EMACS)' $(PYTHON) tools/ert_runner.py
 
@@ -55,6 +59,9 @@ __raw-test-font-lock:
 
 __raw-test-lsp:
 	@LUAU_TEST_SELECTOR='^luau-lsp-test-' EMACS='$(EMACS)' $(PYTHON) tools/ert_runner.py
+
+__raw-test-interface:
+	@LUAU_TEST_SELECTOR='^luau-interface-test-' EMACS='$(EMACS)' $(PYTHON) tools/ert_runner.py
 
 __raw-test-tools:
 	@$(PYTHON) -m unittest discover -s tools -p 'test_*.py' -v

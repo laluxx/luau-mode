@@ -18,6 +18,7 @@
 (require 'cl-lib)
 (require 'subr-x)
 (require 'json)
+(autoload 'eww "eww" "Display a URL in an Emacs web buffer." t)
 
 (declare-function url-retrieve-synchronously "url" (url &optional silent inhibit-cookies timeout))
 (defvar url-http-response-status)
@@ -216,6 +217,96 @@ Restart the current LSP workspace after an update."
     (message "Roblox API installed in %s; restart the Luau language server"
              luau-roblox-api-cache-directory)
     definitions))
+
+(defgroup luau-roblox-docs nil
+  "Online Roblox Creator Hub documentation in Luau buffers."
+  :group 'luau-roblox :prefix "luau-roblox-docs-")
+
+(defcustom luau-roblox-docs-base-url
+  "https://create.roblox.com/docs/reference/engine/"
+  "Official Roblox Creator Hub reference base URL.
+Links open on explicit command only; no network operation runs at startup."
+  :type 'string :group 'luau-roblox-docs)
+
+(defcustom luau-roblox-docs-browser #'eww
+  "Function used to open Roblox Creator Hub reference pages.
+The default `eww' opens live HTML documentation inside Emacs.  Use
+`browse-url' instead if Creator Hub content requires a JavaScript browser."
+  :type 'function :group 'luau-roblox-docs)
+
+(defcustom luau-roblox-docs-known-symbols
+  '(("Camera" . "classes") ("Workspace" . "classes")
+    ("workspace" . "classes") ("game" . "classes")
+    ("Instance" . "classes") ("Part" . "classes")
+    ("Humanoid" . "classes") ("Player" . "classes")
+    ("Players" . "classes") ("RunService" . "classes")
+    ("TweenService" . "classes") ("Vector3" . "datatypes")
+    ("Vector2" . "datatypes") ("CFrame" . "datatypes")
+    ("Color3" . "datatypes") ("UDim2" . "datatypes")
+    ("TweenInfo" . "datatypes") ("RaycastParams" . "datatypes")
+    ("CameraType" . "enums"))
+  "Known Roblox symbols and their Creator Hub reference categories.
+Additional APIs can be added without changing source code.  For unknown
+symbols the documentation command asks for the reference category instead
+of guessing or silently generating an incorrect link."
+  :type '(alist :key-type string
+                :value-type (choice (const "classes")
+                                    (const "datatypes")
+                                    (const "enums")
+                                    (const "globals")
+                                    (const "libraries")))
+  :group 'luau-roblox-docs)
+
+(defface luau-roblox-docs-title-face
+  '((t :inherit link))
+  "Face for Roblox reference links in editor status output."
+  :group 'luau-roblox-docs)
+
+(defun luau-roblox-docs--target-at-point ()
+  "Return the likely Roblox symbol represented by point.
+Recognize the enum type in `Enum.Foo' and Roblox constructors in
+`Vector3.new' without assuming the receiving value's runtime class."
+  (when-let* ((symbol (thing-at-point 'symbol t)))
+    (save-excursion
+      (let ((begin (save-excursion (skip-syntax-backward "w_") (point))))
+        (goto-char begin)
+        (if (and (> (point) (point-min)) (eq (char-before) ?.))
+            (progn
+              (backward-char)
+              (skip-syntax-backward "w_")
+              (let ((owner (thing-at-point 'symbol t)))
+                (if (equal owner "Enum") symbol owner)))
+          symbol)))))
+
+(defun luau-roblox-docs--reference (name category)
+  "Return the official documentation URL for NAME in CATEGORY."
+  (unless (and (stringp name)
+               (string-match-p "\\`[[:alpha:]_][[:alnum:]_]*\\'" name)
+               (member category '("classes" "datatypes" "enums"
+                                  "globals" "libraries")))
+    (user-error "Invalid Roblox reference category or identifier"))
+  (let ((name (cond ((equal name "workspace") "Workspace")
+                    ((equal name "game") "DataModel")
+                    (t name))))
+    (concat luau-roblox-docs-base-url category "/" name)))
+
+;;;###autoload
+(defun luau-roblox-doc-at-point (&optional symbol)
+  "Open the live Creator Hub reference for Roblox SYMBOL at point.
+When the category is unknown, explicitly ask which API category to use.
+For local LSP hover and signature help, use `luau-lsp-show-doc' instead."
+  (interactive)
+  (let* ((name (or symbol (luau-roblox-docs--target-at-point)
+                   (completing-read "Roblox API symbol: "
+                                    (mapcar #'car luau-roblox-docs-known-symbols)
+                                    nil t)))
+         (category (or (cdr (assoc name luau-roblox-docs-known-symbols))
+                       (completing-read
+                        (format "%s reference category: " name)
+                        '("classes" "datatypes" "enums" "globals" "libraries")
+                        nil t))))
+    (funcall luau-roblox-docs-browser
+             (luau-roblox-docs--reference name category))))
 
 ;;;###autoload
 (defun luau-roblox-api-status ()

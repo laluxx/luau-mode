@@ -1,0 +1,24 @@
+#+TITLE: Luau Mode — Cycle 09 (Installed-package release gate)
+#+AUTHOR: laluxx
+
+* Native baseline
+
+Cycle 08: 15/15 PASS, 47/47 ERT, 38/38 Python tooling, no warnings, 22.06s
+(Emacs 32.0.50; source hashes confirmed against the Cycle 08 full archive).
+
+* Changes
+
+- Add deterministic multi-file package builder (tools/build_release.py).
+- Add strict metadata validation and six offline packaging regressions.
+- Add an isolated package-install-file smoke test (test/batch-package-install.el).
+- Integrate test-install as check gate #4; the suite now has 16 checks.
+- Preserve a single make check command and automatic diagnostics bundle.
+- Keep Roblox API and lsp-mode behavior unchanged.
+- Set development version to 0.9.0 (not yet a public MELPA release).
+
+* Next
+
+Run make check in GNU Emacs 32 and upload the report TAR.GZ. If the
+new installed-package gate fails, repair it before expanding the feature
+surface. Verify actual luau-lsp handshakes and replace the non-project URL
+before MELPA submission.

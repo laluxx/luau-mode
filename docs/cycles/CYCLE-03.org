@@ -1,0 +1,28 @@
+#+TITLE: Luau Mode — Cycle 03
+#+AUTHOR: laluxx
+
+* Scope
+
+- Repair the unbound custom font-lock face references.
+- Eagerly declare luau-mode's language ID to lsp-mode, independent of an executable.
+- Keep .luau autoloading; make .lua opt-in rather than hijacking every Lua file.
+- Fix legacy Flymake variable declaration timing and Eglot mock variable defaults.
+- Repair canonical Rojo process root keys and test root comparison.
+- Add theme-inherited custom faces, switches, and re-fontification.
+- Make one =make check= run all quality gates and automatically save a diagnostics TAR.GZ.
+- Introduce standalone font-lock regression tests and a packaging source audit.
+
+* Limits
+
+- The authoring container does not provide GNU Emacs; batch ERT, Checkdoc,
+  byte-compilation, package-lint and live language server interaction cannot
+  be validated here. Run =make check= in the local GNU Emacs 32 checkout.
+- Strict byte-compilation, ERT and doctor still require local verification.
+- A package must not be advertised as MELPA-ready without these native gates.
+
+* Next
+
+- Consume the full =make check= TAR.GZ and remove all remaining native warnings.
+- Add coverage for nuanced Luau parser/indentation corner cases and benchmark
+  results relative to recorded local baselines.
+- Prepare MELPA recipe when a public repository and zero-warnings build exist.

@@ -38,7 +38,7 @@ except ImportError:  # pragma: no cover - unavailable on Windows.
 
 
 TASKS = (
-    "dependencies", "test", "test-core", "test-lsp", "test-font-lock", "test-tools", "test-static", "package-audit",
+    "dependencies", "test-install", "test", "test-core", "test-lsp", "test-font-lock", "test-interface", "test-tools", "test-static", "package-audit",
     "verify-delta", "compile", "compile-strict", "doctor", "checkdoc",
     "package-lint", "lint", "bootstrap", "clean", "clean-bytecode",
     "benchmark-font-lock", "benchmark-navigation",
@@ -119,9 +119,11 @@ def synopsis(target: str) -> str:
     descriptions = {
         "dependencies": "ensure isolated package-lint is installed (network on first run)",
         "test": "entire recursively discovered ERT suite",
+        "test-install": "isolated package.el tar installation and autoload smoke test",
         "test-core": "editing, font-lock and Rojo regressions",
         "test-lsp": "optional lsp-mode / Eglot registration tests",
         "test-font-lock": "autoload, faces, custom syntax fontification regressions",
+        "test-interface": "Imenu, Eldoc, matching keywords and live Roblox docs",
         "package-audit": "MELPA metadata, face inheritance and autoload source audit",
         "test-tools": "offline Python tooling tests",
         "test-static": "static source checks (not native Emacs checks)",
@@ -153,7 +155,21 @@ def machine_info(root: Path) -> dict[str, Any]:
         "source_files": 0,
         "test_files": 0,
         "benchmark_files": 0,
+        "package_version": None,
+        "development_cycle": None,
     }
+    # Report the actual checked-out source, not a remembered cycle label.
+    source = root / "luau-mode.el"
+    if source.is_file():
+        match = re.search(r"^;; Version: ([0-9]+(?:\.[0-9]+)+)\s*$",
+                          source.read_text(encoding="utf-8"), re.M)
+        if match:
+            info["package_version"] = match.group(1)
+    cycle_numbers = [int(match.group(1))
+                     for path in (root / "docs").glob("CYCLE-*.org")
+                     if (match := re.fullmatch(r"CYCLE-([0-9]+)\.org", path.name))]
+    if cycle_numbers:
+        info["development_cycle"] = max(cycle_numbers)
     for path in root.glob("**/*.el"):
         if set(path.relative_to(root).parts) & {".git", ".packages", ".build"}:
             continue
@@ -485,6 +501,11 @@ def run_suite(name: str, targets: list[str], opts: Options) -> int:
     print(f"  {machine['source_files']} sources  " + paint("│", "dim", opts.color)
           + f"  {machine['test_files']} test modules  "
           + paint("│", "dim", opts.color) + f"  {machine['benchmark_files']} benchmarks")
+    if machine["package_version"]:
+        revision = f"  Package {machine['package_version']}"
+        if machine["development_cycle"] is not None:
+            revision += f"  " + paint("│", "dim", opts.color) + f"  Cycle {machine['development_cycle']:02d}"
+        print(revision)
     print(divider(opts))
     started = utc_now()
     begin = time.monotonic()
@@ -793,7 +814,7 @@ def show_help() -> None:
             ("make quickcheck", "Fast compile, tests, lint, and tools"),
             ("make doctor", "Recursive Checkdoc and package-lint"),
             ("make test", "Every Luau ERT test, recursively discovered"),
-            ("make test-core / make test-lsp / make test-font-lock", "Focused ERT suites"),
+            ("make test-core / make test-lsp / make test-font-lock / make test-interface", "Focused ERT suites"),
             ("make test-tools / make test-static", "Offline checks"),
             ("make triage", "Rerun unresolved failing targets"),
             ("make failures", "Detailed failures with log paths"),

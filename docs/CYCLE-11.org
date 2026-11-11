@@ -1,0 +1,35 @@
+#+TITLE: Luau Mode — Cycle 11 / Installed-source provenance and green-gate repair
+
+* Goal
+
+Fix the false-cycle diagnosis seen in the 2026-11-11 01:17 Make report:
+its source SHA-256 inventory matched the public Cycle 09 archive exactly,
+not Cycle 10.  The report ran 16 targets and found 47 ERT tests;
+Cycle 10 adds the test-interface target and new structural UI tests.
+
+* Changes
+
+- Ship the complete Cycle 10 feature set as a fresh, installable Cycle 11
+  tar.gz so a user can replace an older checkout in one operation.
+- Advance the package's development version to 0.9.1.
+- Report package version and cycle identity in the Make check header,
+  JSON machine metadata, and uploaded source hash inventory.
+- Preserve the already corrected Checkdoc message in
+  test/batch-package-install.el ("Package.el did not install luau-mode").
+- Preserve metadata's no-byte-compile marker in release TAR descriptors.
+- Regression-test source identity reporting and known Checkdoc cleanup.
+
+* Install
+
+Extract the **full archive** from the parent directory of the Emacs Lisp
+checkout, not from within the luau-mode directory.  For example:
+
+  tar -xzf luau-mode-cycle-11-full.tar.gz -C ~/.config/emacs/lisp/
+
+Restart Emacs before testing loaded features, then run in luau-mode/:
+
+  make check
+
+The Make header must report "Cycle 11" and "Package 0.9.1" and must
+include the interface test target among the 17 checks.  If not, the wrong
+source directory is being tested.  Native Emacs validation is required.

@@ -19,7 +19,8 @@ does not stop subsequent gates. In all cases it writes
 
 ## Required release gates
 
-- [ ] Real GNU Emacs 31.1+ `make check` full PASS, zero compiler warnings
+- [x] Cycle 08: GNU Emacs 32.0.50 `make check` passed all 15 gates, zero compiler warnings
+- [ ] Cycle 09: new 16-gate `make check` including real installed-package smoke test
 - [ ] `package-lint` full PASS for all distributed package modules;
       Checkdoc + byte compilation must pass for all auxiliary `.el` files
 - [ ] ERT confirms `.server.luau` auto-mode activation and all custom faces
@@ -28,6 +29,7 @@ does not stop subsequent gates. In all cases it writes
 - [ ] No duplicate LSP startup when another client manages a buffer
 - [ ] Manual smoke test of indentation, strings, type declarations, and Imenu
 - [ ] Verify all published files are licensed consistently and attribute GNU Lua
+- [ ] Verify isolated `package-install-file` from the generated multi-file archive
 - [ ] Publish a canonical repository and source URL, then submit MELPA recipe
 
 MELPA's official instructions: https://github.com/melpa/melpa/blob/master/CONTRIBUTING.org
@@ -44,3 +46,16 @@ interactive command, into a user cache outside this package.  The standard
 15-target `make check` matrix remains the single quality entry point.
 The external live LSP connection and asset download are separate integration
 checks which require the user's machine and network, respectively.
+
+## Cycle 09: archive and isolated installation smoke
+
+GNU Emacs documents multi-file package archives as `NAME-VERSION.tar` with
+`NAME-pkg.el` inside a versioned root. `tools/build_release.py` constructs
+that deterministic archive from the public source allowlist, then
+`test/batch-package-install.el` installs it into a disposable `-Q` profile.
+This is a new `test-install` gate under the canonical `make check` command.
+The green Cycle 08 baseline is preserved as the most recent **native verified**
+run until the Cycle 09 report is returned.
+
+No official MELPA release can occur without the actual project repository
+and a recipe built and tested using MELPA's own package-build machinery.

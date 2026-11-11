@@ -17,7 +17,7 @@
 ;; and Aaron Smith <aaron-lua@gelatinous.com>.
 ;; Original Lua mode maintainer: emacs-devel@gnu.org
 ;; Package-Requires: ((emacs "31.1"))
-;; Version: 0.7.0
+;; Version: 0.9.1
 ;; Keywords: languages, tools
 ;; URL: https://luau.org
 
@@ -98,6 +98,7 @@
 (require 'comint)
 (require 'newcomment)
 (require 'rx)
+(require 'luau-interface)
 (require 'cl-lib)
 (require 'seq)
 (require 'subr-x)
@@ -113,6 +114,7 @@
 (declare-function luau-lsp--select-workspace-variable "luau-lsp" (symbols))
 (declare-function luau-lsp--register-lsp-mode "luau-lsp" ())
 (declare-function luau-roblox-api-status "luau-roblox" ())
+(declare-function luau-roblox-doc-at-point "luau-roblox" ())
 
 (eval-when-compile
   (require 'cl-lib)
@@ -583,6 +585,7 @@ See `imenu-generic-expression'.")
   (with-no-warnings
     (setq-local comment-use-global-state t))
   (setq-local imenu-generic-expression luau-imenu-generic-expression)
+  (luau-interface-setup)
   (when (boundp 'electric-indent-chars)
     ;; If electric-indent-chars is not defined, electric indentation is
     ;; done via `luau-mode-map'.
@@ -3126,6 +3129,9 @@ The original buffer remains untouched if the formatter fails."
 (define-key luau-mode-map (kbd "C-c C-d") #'luau-lsp-diagnose)
 (define-key luau-mode-map (kbd "C-c C-u") #'luau-roblox-api-status)
 (define-key luau-mode-map (kbd "C-c C-r") #'luau-refontify-buffer)
+(define-key luau-mode-map (kbd "C-c C-j") #'luau-imenu)
+(define-key luau-mode-map (kbd "C-c C-o") #'luau-roblox-doc-at-point)
+(define-key luau-mode-map (kbd "C-h v") #'luau-project-variables)
 
 (when luau-associate-lua-files
   (add-to-list 'auto-mode-alist '("\\.lua\\'" . luau-mode)))

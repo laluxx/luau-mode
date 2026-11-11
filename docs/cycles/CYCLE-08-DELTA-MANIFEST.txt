@@ -1,0 +1,12 @@
+Cycle 08 | Incremental Luau Mode source changes
+Apply after Cycle 07; previous-cycle deltas assumed applied.
+This file is excluded from its own SHA-256 ledger.
+
+MODIFIED  e2e954ecf94192d54142e9963edbddf7d35858f5622696b554638424c8c3dcd6  luau-mode/README.md
+ADDED  07fa36a37f20cbaf9ef5d3d6fad328893fa0f7be9d93f7cdbf4f3c4d8a198daa  luau-mode/docs/CYCLE-08.org
+MODIFIED  6bfa682cd10a60ae665609b4f0028489f6d843c79f0897f0121755ccabf0eb58  luau-mode/luau-mode.el
+MODIFIED  130276b57141969a5b9724765ffd2e6cb622ff85931c69665207f256c29c0c32  luau-mode/luau-roblox.el
+MODIFIED  7f0e60de21f7e33b4ef4b115b0a3d27e79d2594aca8e8b8bab8527a7f4f3552c  luau-mode/test/luau-roblox-test.el
+MODIFIED  720ee93b7fcb631f4ac0229a7d4d54dd72213c00489d882e19b20bfee3fcc6d3  luau-mode/tools/package_audit.py
+
+All other paths remain untouched from Cycle 07.

@@ -1,0 +1,10 @@
+MODIFIED  191b631bb3d94f69dcaf5841398bdc107c1510dddca7ba5766401db020eda4b9  luau-mode/README.md
+ADDED  6c7f0aefb25038c537214f8d52f29be9f11ed9a6b6c0eff78cc84dbc99f5d9d2  luau-mode/docs/CYCLE-06.org
+MODIFIED  4eac720d1613fa3488fb08d3a723eecde60089f4f15a82e2bdb04b38f5603cd1  luau-mode/docs/MELPA-READINESS.md
+MODIFIED  4f55ecde32ea30b6ed3c4a3d72366e420930f5baebc8cbadcfea2fa63d29ac17  luau-mode/luau-lsp.el
+MODIFIED  867db1ed60a4bc28bf6c4cb266f7105a7842c4f7a0ff5ad8b984598c7538c443  luau-mode/luau-mode.el
+MODIFIED  4a686f14aaee4c99f3fde57171dcef99ea5a37c9f15a48686847b88558648720  luau-mode/test/luau-font-test.el
+MODIFIED  357eb20dd7aa4323878eed289f41a1f72ca5aea87e02bdcedf594b9c918680cc  luau-mode/test/luau-lsp-test.el
+MODIFIED  44bc620332b38f9fc5f3fea0138b43bdeb3fef25a0ef5bd1a8c9eab9da185981  luau-mode/tools/make_ui.py
+MODIFIED  0bcec8904c670b2358b114d5b1aa855a7caa413ad7ce16fc41adaef246ba146f  luau-mode/tools/package_audit.py
+MODIFIED  68587e57fa4867f571351c5e2069462d5403d5e8832c2f2472043a0e646d9df6  luau-mode/tools/test_make_ui.py

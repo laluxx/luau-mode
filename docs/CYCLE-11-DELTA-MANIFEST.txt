@@ -1,0 +1,12 @@
+Luau Mode Cycle 11 strict delta
+Author: laluxx
+Based on published Cycle 10 full archive
+Root directory: luau-mode/
+Canonical diagnostic command: make check
+
+MODIFIED 61134315ef9d01794a8ee460dac6fc9283374cfd3c2cf75460b1ab6c3cf92ff1 luau-mode/README.md
+ADDED 4f2773ef9d3ef6402e1e80478b6999f943c3c70b37083a16edce24ffe0c695e8 luau-mode/docs/CYCLE-11.org
+MODIFIED cc99069dd84078b906591b2aa7d55fc076a58a17b6c72980a99dec0c6af646f8 luau-mode/luau-mode.el
+MODIFIED dfc96dc8ba4a8cd7b64c02471540953ef2fecb7dfb5f7e512e1592a809a6d5c7 luau-mode/tools/make_ui.py
+MODIFIED 85bddfb0e86f13867d1782d86f6964f3c80c3b16556bb5e23f0f21460857e987 luau-mode/tools/package_audit.py
+MODIFIED d10ad84926e92a218573d0e3879fad8398a706ef2388271f612f80d4ba810fca luau-mode/tools/test_make_ui.py

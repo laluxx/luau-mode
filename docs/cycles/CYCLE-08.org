@@ -1,0 +1,37 @@
+#+title: Luau Mode — Cycle 08 — Roblox module native-green repairs
+#+author: laluxx
+
+* Input and observed failures
+
+Cycle 07's native GNU Emacs 32.0.50 make check reported 11/15 passing,
+4 failures, and 0 timeouts.  The ERT suite passed 45/45, and both
+benchmarks passed.  The failures were:
+
+- Strict byte compiler: unescaped character literal ?[ in luau-roblox.el.
+- Checkdoc/doctor: syntax-scan failure in the same source form.
+- package-lint/doctor: Package-Requires declared outside luau-mode.el.
+- Native compiler, outside make check: unknown function luau-roblox-api-status.
+
+* Code changes
+
+- Use Emacs-compatible escaped punctuation literals in the JSON document
+  start check.  This is a reader/syntax fix, not a change in the accepted
+  JSON documents (objects and arrays remain allowed).
+- Keep the package dependency header in the primary package source only.
+- Declare luau-roblox-api-status before the Luau keymap references it.
+- Add ERT regressions for source parseability and interactive keymap entry.
+- Add offline package audit checks for these same source contracts.
+
+* Validation boundary
+
+Local: 38 Python tooling tests and the source/package audit pass;
+no Emacs executable is installed here.  Native ERT, Checkdoc,
+package-lint, strict compilation and native compilation must be confirmed
+on the user's GNU Emacs installation.  Do not mark Cycle 08 as 15/15
+green until the next make check report arrives.
+
+* The only command to run
+
+make check
+
+Upload the generated .build/luau-make-report-*-check.tar.gz.
