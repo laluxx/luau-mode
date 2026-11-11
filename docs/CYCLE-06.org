@@ -1,0 +1,33 @@
+#+TITLE: Luau Mode — Cycle 06 / Green-Gate Stabilization
+#+AUTHOR: laluxx
+
+* Input
+Cycle 05 diagnostic report: 6 PASS, 8 FAIL, 1 TIMEOUT, 27/33 ERT.
+All failures remain authoritative until rerun in GNU Emacs; static green is
+not evidence of native green.
+
+* Root causes addressed
+- Font-lock syntax-ppss was moving the scanner cursor while preserving match
+  data, resulting in nonadvancing regex scans, ERT timeouts and a benchmark
+  timeout. Preserve excursion AND match data in one shared syntax-state helper called
+  from every optional source matcher.
+- Eglot navigation relied on private =eglot--workspace-symbols=. Replace it
+  with public =jsonrpc-request= + =eglot-current-server= and shared symbol
+  selection with lsp-mode.
+- LSP test mocks declared lsp-mode in an ineffective lexical features binding;
+  mock the require boundary explicitly and independently of the server binary.
+- Eglot global settings ERT captured default-value inside a dynamic binding;
+  set a buffer-local fixture and compare default settings before and after.
+- Python timeout test used an immediate-success fake Make target; make fake
+  benchmark-navigation sleep long enough for the timeout assertion.
+- Main package Package-Requires declares Emacs 31.1, matching rx `any' use;
+  remove nonstandard bloblox/ and run-luau aliases from distributed namespace;
+  add an upstream Luau documentation URL temporarily for package-lint.
+- Remove package-level eval-after-load hooks; register lsp-mode from the
+  Luau major-mode hook, before the user configuration hook starts lsp.
+
+* Remaining release gates
+Run =make check= on GNU Emacs, inspect =.build/luau-make-report-*-check.tar.gz=,
+fix any remaining native ERT, strict compile, and package-lint complaints.
+The project URL header must be replaced by laluxx's actual repository before
+MELPA publication. Do not claim native green based on Python checks.

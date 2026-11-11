@@ -1,0 +1,48 @@
+#+TITLE: Luau Mode Cycle 02
+#+AUTHOR: laluxx
+#+DATE: 2026-11-10
+
+* Goals
+
+- Prefer installed lsp-mode for Luau, retaining Eglot fallback.
+- Run the official luau-lsp lsp stdio server using customizable arguments.
+- Preserve source-only language mode when optional dependencies are absent.
+- Avoid global configuration and cross-client conflicts.
+- Adapt Monad Mode's rich Make quality/report pipeline to Luau.
+- Deliver a strict incremental TAR.GZ with SHA-256 manifest and baseline validation.
+
+* Implemented
+
+- New luau-lsp.el with auto | lsp-mode | eglot | none backend selection.
+- Client registration for language ID luau, multi-root, dynamic command callback.
+- LSP settings for Rojo, pinned API definitions, Roblox platform, sourcemaps.
+- Local lsp-mode quality-of-life options inspired by the provided init.el.
+- Buffer-local Eglot server config; workspace variables for both clients.
+- Local C-c C-k documentation UI, setup diagnostics with status faces.
+- Multi-target Make runner with timed diagnostics, ANSI terminal colors,
+  complete logs, JUnit XML, saved JSON, triage, history and bundle.
+- Recursive strict Checkdoc and package-lint; no silent skip when absent.
+- Headless ERT collection and external-Python unit tests.
+
+* Proof of work
+
+- Python runner / delta tests: 32 passed.
+- Python static structural checks: passed.
+- Actual Emacs binary unavailable in creation environment.
+- Consequently Emacs ERT, byte compilation, Checkdoc, package-lint and
+  end-to-end luau-lsp protocol tests remain UNVERIFIED.
+
+* One canonical local command
+
+#+begin_src sh
+cd ~/path/to/luau-mode
+make diagnostics-bundle
+#+end_src
+
+The resulting .build/luau-make-report-*.tar.gz includes complete logs,
+report.json, report.txt and junit.xml, even if a target fails.
+
+* Next cycle
+
+Fix the diagnostics bundle and deepen Luau parser correctness; extend
+benchmark and ERT coverage to real interpreter/language-server interactions.

@@ -1,0 +1,28 @@
+#+TITLE: Luau Mode — Cycle 05
+#+AUTHOR: laluxx
+
+* Scope
+
+- Fix the regexp match-data corruption in the Roblox global font-lock matcher.
+- Replace Emacs 31-obsolete buffer formatting calls with version-gated APIs.
+- Declare optional LSP integration variables special in batch-compiled tests.
+- Keep Checkdoc recursive; package-lint only the distributed package files.
+- Fix script footer Checkdoc violations.
+- Add a theme-aware compilation entrypoint, =luau-make-check=, that decodes ANSI
+  only in its own compilation buffer.
+- Share one colored CLI vocabulary across all Make targets: cyan RUN glyphs,
+  green PASS ticks, red FAIL crosses, yellow TIMEOUT indicators.
+- Stabilize report ordering with nanosecond-based run IDs.
+- Add regressions for original match boundaries, Make integration and ANSI alignment.
+
+* Local verification
+
+Run the full source audit, static checker and Python tooling suite. They do not
+substitute for native Emacs tests (this build environment lacks Emacs).
+
+* Next cycle
+
+Run =make check= locally under Emacs 32 and supply the report TAR.GZ. Address
+remaining byte-compilation, ERT and package-lint failures. Verify a real
+=luau-lsp lsp= handshake in a Rojo project. Prepare a MELPA recipe only after
+all native checks pass and a public canonical project repository exists.

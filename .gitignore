@@ -1,0 +1,8 @@
+# Editor, build, toolchain and language-server generated files
+*.elc
+*.eln
+.packages/
+.build/
+__pycache__/
+*.pyc
+sourcemap.json

@@ -1,0 +1,34 @@
+#+TITLE: Luau Mode — Cycle 04
+#+AUTHOR: laluxx
+
+* Observed failures (Cycle 03 local summary, GNU Emacs 32.0.50)
+
+- Strict byte-compile: luau-process-init-code referenced before its defcustom.
+- Four timeout targets: test, test-core, test-font-lock, benchmark-font-lock.
+- LSP tests: mock registration and Eglot local-command tests failed.
+- Recursive lint: 171 issues; only a small excerpt was uploaded.
+- Checkdoc: one message capitalization issue.
+- Python tooling: sporadic latest-report triage ordering failure.
+
+* Changes
+
+- Relocate luau-process-init-code ahead of compiler references.
+- Preserve regular-expression match-data across syntax-ppss calls.
+- Add isolated ERT enumeration and per-test fresh Emacs processes.
+- Terminate process groups on timeout, including spawned child processes.
+- Print exact timed-out test names with full logs; never silently skip.
+- Shorten default quality-gate timeouts and font-lock benchmark workload.
+- Add regression tests for timeout, test failure, test discovery failure and PASS.
+- Secondary .el files declare their relation to the main package for linting.
+- Update the README and local report instructions.
+
+* Validation boundary
+
+The authoring runtime has no Emacs binary; native checks cannot be claimed.
+Static source, package audit and Python tests are separately available.
+An upstream Git repository URL has not yet been provided for MELPA.
+
+* Next
+
+Run =make check= and upload the report TAR.GZ; prioritize precise timed-out
+ERT test names and full package-lint diagnostics for Cycle 05.

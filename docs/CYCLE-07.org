@@ -1,0 +1,58 @@
+#+title: Luau Mode — Cycle 07 — Roblox API integration
+#+author: laluxx
+
+* Motivation
+
+Cycle 06 achieved a genuinely green 15/15 local Emacs check.  However,
+Roblox scripts can still show Unknown type Vector3/CFrame/Camera and
+Unknown global workspace when the running external luau-lsp session lacks
+Roblox API declarations.  This is a *server environment* failure, not a
+font-lock issue.  A Rojo sourcemap is related but distinct: it resolves the
+file-system / DataModel tree, not the engine API types themselves.
+
+* Implementation
+
+- New optional luau-roblox.el module with an explicit CDN asset installer.
+- Downloaded declarations and documentation are managed outside the repo.
+- Nothing is downloaded during mode activation, ERT, or make check.
+- Cache selection is automatic when files exist, manual cache-only, or
+  server-bundled; private files may override either source.
+- Ordinary game scripts use the None security declaration set by default;
+  Roblox Studio plugins can customize the API security level.
+- The command added to luau-lsp is --definitions:@roblox=FILE, optionally
+  followed by --docs=FILE, matching the upstream editor-client protocol.
+- Downloaded contents are checked and replaced with atomic renames.
+- M-x luau-roblox-api-status shows the active API configuration.
+- M-x luau-roblox-api-install explicitly fetches the selected API set.
+- M-x luau-lsp-restart restarts the active language server to use them.
+- C-c C-u in Luau buffers opens the API status display.
+- Extended local test coverage for cache selection and download integrity.
+
+* Install and use
+
+1. Apply Cycle 07 (delta onto 06, or full source).
+2. In a Luau buffer, run M-x luau-roblox-api-install.
+3. Run M-x luau-lsp-restart.
+4. Confirm with M-x luau-lsp-diagnose and M-x luau-roblox-api-status.
+5. Run the canonical make check in the package root and upload the report.
+
+The built-in Roblox API may already be sufficient in modern luau-lsp
+builds; the local cache provides an explicit fallback when the live server
+reports missing engine globals.  It does not replace Roblox Studio or
+provide live runtime values.  The official documentation is consumed through
+LSP hover/signature interfaces, including C-c C-k.
+
+* Validation boundary
+
+The authoring container has no Emacs or luau-lsp executable.  Python
+quality tools, static structure, and archive hashes are validated locally;
+the new ERT tests, package-lint, and live luau-lsp handshake require the
+user's Emacs installation.  Do not claim those checks passed until the next
+uploaded native make check bundle confirms them.
+
+* Upstream documentation
+
+- https://github.com/JohnnyMorganz/luau-lsp
+- https://github.com/JohnnyMorganz/luau-lsp/blob/main/editors/README.md
+- https://luau-lsp.pages.dev/type-definitions/globalTypes.None.d.luau
+- https://luau-lsp.pages.dev/api-docs/en-us.json
