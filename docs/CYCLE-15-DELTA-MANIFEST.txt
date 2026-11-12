@@ -1,0 +1,11 @@
+Cycle 15 strict incremental delta rooted at luau-mode/
+Baseline: uploaded Cycle 14 verified sources, with 91/91 native ERT passed.
+Only Cycle 15 additions and changes; no previous-cycle snapshots, third-party docs,
+build products, Python bytecode, local SVG icons, or unmodified package files.
+
+# STATUS  SHA256  ARCHIVE_MEMBER
+MODIFIED e8e60f210b077c0f385a3aed07f777b545c9b2d4b2a1ab72d85323e5cdfdace3 luau-mode/README.md
+ADDED 70c431ce608b34db8179983592f8626213e4067b0781ed756d2c822f5da51117 luau-mode/docs/CYCLE-15.org
+MODIFIED 6dab6ee7efca7de9722162395913fb349c9ae217e0b3116a840831f267b3a3e0 luau-mode/luau-browser.el
+MODIFIED 4ea02c448471443c6be618f3bdf21134fb1d5060e11db48de8dc7c498a84d473 luau-mode/luau-mode.el
+MODIFIED 831f77e292c558d5181dd44e63467fece668fbf33a3e6a8dd1d7d81a7b24fdc2 luau-mode/test/luau-browser-test.el

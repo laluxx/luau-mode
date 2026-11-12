@@ -16,7 +16,8 @@ import tarfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = "luau-mode"
-MODULES = ("luau-mode.el", "luau-lsp.el", "luau-roblox.el", "luau-make.el", "luau-interface.el")
+MODULES = ("luau-mode.el", "luau-lsp.el", "luau-roblox.el",
+           "luau-make.el", "luau-interface.el", "luau-browser.el")
 DATA = ("README.md", "COPYING")
 HEADER_VERSION = re.compile(r"^;; Version: (\d+(?:\.\d+)+)$", re.M)
 HEADER_REQUIRES = re.compile(r'^;; Package-Requires: (\(\(emacs "\d+(?:\.\d+)+"\)\))$', re.M)

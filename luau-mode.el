@@ -99,6 +99,7 @@
 (require 'newcomment)
 (require 'rx)
 (require 'luau-interface)
+(require 'luau-browser)
 (require 'cl-lib)
 (require 'seq)
 (require 'subr-x)
@@ -586,6 +587,7 @@ See `imenu-generic-expression'.")
     (setq-local comment-use-global-state t))
   (setq-local imenu-generic-expression luau-imenu-generic-expression)
   (luau-interface-setup)
+  (luau-browser-setup)
   (when (boundp 'electric-indent-chars)
     ;; If electric-indent-chars is not defined, electric indentation is
     ;; done via `luau-mode-map'.
@@ -3126,11 +3128,15 @@ The original buffer remains untouched if the formatter fails."
 (define-key luau-mode-map (kbd "C-c C-a") #'luau-analyze-file)
 (define-key luau-mode-map (kbd "C-c C-k") #'luau-lsp-show-doc)
 (define-key luau-mode-map (kbd "C-c C-s") #'luau-setup-language-server)
-(define-key luau-mode-map (kbd "C-c C-d") #'luau-lsp-diagnose)
+(define-key luau-mode-map (kbd "C-c C-d") #'luau-browser-at-point)
 (define-key luau-mode-map (kbd "C-c C-u") #'luau-roblox-api-status)
 (define-key luau-mode-map (kbd "C-c C-r") #'luau-refontify-buffer)
 (define-key luau-mode-map (kbd "C-c C-j") #'luau-imenu)
-(define-key luau-mode-map (kbd "C-c C-o") #'luau-roblox-doc-at-point)
+(define-key luau-mode-map (kbd "M-n") #'luau-interface-goto-matching-end)
+(define-key luau-mode-map (kbd "M-p") #'luau-interface-goto-matching-beginning)
+;; Prefer native local documentation, falling back to `eww' on demand.
+(define-key luau-mode-map (kbd "C-c C-o") #'luau-browser-at-point)
+(define-key luau-mode-map (kbd "C-c C-b") luau-browser-command-map)
 (define-key luau-mode-map (kbd "C-h v") #'luau-project-variables)
 
 (when luau-associate-lua-files

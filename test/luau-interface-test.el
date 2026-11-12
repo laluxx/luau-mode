@@ -29,7 +29,13 @@
     (should (memq #'luau-interface--refresh-match post-command-hook))
     (should (eq (lookup-key luau-mode-map (kbd "C-c C-j")) #'luau-imenu))
     (should (eq (lookup-key luau-mode-map (kbd "C-c C-o"))
-                #'luau-roblox-doc-at-point))
+                #'luau-browser-at-point))
+    (should (eq (lookup-key luau-mode-map (kbd "C-c C-b m"))
+                #'luau-browser-members))
+    (should (eq (lookup-key luau-mode-map (kbd "M-n"))
+                #'luau-interface-goto-matching-end))
+    (should (eq (lookup-key luau-mode-map (kbd "M-p"))
+                #'luau-interface-goto-matching-beginning))
     (should (eq (lookup-key luau-mode-map (kbd "C-h v"))
                 #'luau-project-variables))))
 
@@ -133,6 +139,26 @@
                        (goto-char (cadr pair))
                        (buffer-substring-no-properties (point) (+ (point) 3)))
                      "end")))))
+
+(ert-deftest luau-interface-test-matching-keyword-navigation ()
+  "Forward and backward commands navigate the highlighted keyword pair."
+  (with-temp-buffer
+    (insert "function outer()\n"
+            "  if true then\n"
+            "    warn('nested')\n"
+            "  end\n"
+            "end\n")
+    (luau-mode)
+    (goto-char (point-min))
+    (search-forward "if")
+    (backward-word)
+    (call-interactively #'luau-interface-goto-matching-end)
+    (should (looking-at "end"))
+    (call-interactively #'luau-interface-goto-matching-beginning)
+    (should (looking-at "if"))
+    (search-forward "warn")
+    (backward-word)
+    (should-error (luau-interface-goto-matching-end) :type 'user-error)))
 
 (ert-deftest luau-interface-test-matching-face-and-cleanup ()
   "Keyword overlays use region faces and are removed with the mode."

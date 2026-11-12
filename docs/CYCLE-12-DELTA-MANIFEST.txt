@@ -1,0 +1,10 @@
+Luau Mode — Cycle 12 strict incremental delta
+Baseline: user's uploaded, locally green luau-mode.tar.gz
+Files added:
+  luau-mode/docs/CYCLE-12.org
+  luau-mode/docs/CYCLE-12-DELTA-MANIFEST.txt
+Files modified:
+  luau-mode/luau-browser.el
+  luau-mode/test/luau-browser-test.el
+No other files are included. Extract over existing luau-mode/ directory.
+Canonical local validation: make check

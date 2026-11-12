@@ -385,6 +385,28 @@ The scan deliberately ignores comments, strings and nested block keywords."
                           (throw 'found pair)))))))))
             pair))))))
 
+(defun luau-interface--goto-matching-keyword (side)
+  "Move point to the matching keyword on SIDE of the pair at point.
+SIDE is `beginning' or `end'."
+  (let* ((keyword (luau-interface--keyword-at-point))
+         (pair (and keyword (luau-interface--keyword-pair (car keyword))))
+         (destination (and pair (if (eq side 'beginning)
+                                    (car pair)
+                                  (cadr pair)))))
+    (unless destination
+      (user-error "No matching Luau block keyword at point"))
+    (goto-char destination)))
+
+(defun luau-interface-goto-matching-end ()
+  "Move point to the matching block ending highlighted for this keyword."
+  (interactive)
+  (luau-interface--goto-matching-keyword 'end))
+
+(defun luau-interface-goto-matching-beginning ()
+  "Move point to the matching block beginning highlighted for this keyword."
+  (interactive)
+  (luau-interface--goto-matching-keyword 'beginning))
+
 (defun luau-interface--clear-match ()
   "Remove matching-keyword overlays from this buffer."
   (mapc #'delete-overlay luau-interface--match-overlays)

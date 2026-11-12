@@ -1,0 +1,59 @@
+#+title: Luau Mode Cycle 15 — Native Documentation Workflow and Completion Discovery
+
+* Starting point
+
+The uploaded Cycle 14 report confirms compile-strict PASS, full ERT 91/91,
+installed-package smoke PASS, package-lint PASS, Python tooling tests PASS,
+with only Checkdoc's literal key-sequence wording at the end of
+=luau-browser.el= failing =doctor= and =checkdoc=. This delta fixes that
+string while preserving the existing green native tests and adding new ones.
+
+* Native documentation redesign
+
+- =C-c C-d= opens the reference at point. =C-c C-o= remains available.
+  The previous diagnostics command moves to =C-c C-b D=; LSP hover remains
+  =C-c C-k=.
+- Local Markdown is rendered in one special-mode buffer with native links,
+  clickable inline API identifiers, heading navigation, and history stacks.
+  =TAB= moves to links, =RET= follows, =l/r= navigate visited documents,
+  =i= lists headings, =j/k= move headings, =z= folds. No EWW is loaded to
+  render local Markdown; EWW remains the default missing-content fallback.
+- =luau-browser-document-presentation= determines native/always-EWW/
+  always-external mode. =luau-browser-web-browser= chooses inherit/EWW/
+  browse-url for explicit and fallback navigation, respecting user Firefox
+  and xdg-open configuration. No machine paths are compiled into sources.
+- Native pages default to full content (no arbitrary line truncation), with a
+  configurable optional line limit for very large files.
+- Documentation hyperlinks resolve to internal entries and local Markdown
+  only within the configured docs checkout; other URLs invoke the selected
+  browser on explicit navigation.
+
+* Completion and documentation discovery
+
+- =C-c C-b a= / =/= searches all indexed types and member declarations,
+  using a metadata-rich completion table for Vertico/Consult.
+- Categorized class, enum, datatype, global and library entrypoints;
+  member-specific navigation retained.
+- =C-c C-b g= searches local guide pages by filename; =C-c C-b t= finds
+  Markdown lines throughout the local docs checkout (ripgrep preferred,
+  pure Elisp fallback). Matching pages open in the native reader.
+- =C-c C-b R= uses the optional public =consult-ripgrep= command for
+  source-oriented search, without introducing a mandatory dependency.
+- Existing official SVG icon support and buffer-local Corfu integration
+  remain in place; global completion settings are untouched.
+
+* Tests, packaging and exit criteria
+
+Added ERT regressions for native keymaps, web browser overrides, independent
+kind searches, member-aware apropos results, guide discovery, text-search
+fallback, Markdown hyperlink buttons, safe path resolution, history and
+heading anchors. Native Emacs validation must be performed by the user's
+canonical =make check= and returned diagnostics TAR.GZ. The generation
+container does not have Emacs installed; do not claim native green without
+this evidence.
+
+After the canonical full suite is green, assess actual navigation and search
+responsiveness on the user's real Creator Docs corpus and resolve any observed
+issues. Freeze the keymap and native-document design when these acceptance
+checks pass, favoring maintenance and regression fixes rather than endless
+feature accumulation.

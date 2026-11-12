@@ -1,0 +1,57 @@
+#+title: Luau Mode Cycle 14 — Structured Member Navigation and Green Gate Repair
+
+* Baseline and strict-delta rule
+
+Only Cycle 14 additions and changed files relative to the locally installed
+Cycle 13 (as verified by the uploaded =make check= source hashes) are shipped.
+The archive has one =luau-mode/= root and includes no historical full snapshot,
+compiled Elisp, local Roblox assets, or Python caches.
+
+* Cycle 13 diagnostic repairs
+
+- =compile-strict=: load =luau-browser= from the package root before referencing
+  =luau-browser-at-point=; it is a bundled package module, not a free function.
+- =test-interface=: assert the now-intended native-first binding on =C-c C-o=,
+  rather than the previous EWW-only command. The legacy web command remains
+  available in =C-c C-b w=.
+- =test=: Emacs Flymake returns human-readable diagnostic text with padding in
+  this environment; trim the presentation prefix before comparing messages,
+  without changing the actual diagnostic ranges or production messages.
+- =test=: preserve the correct monotonic enum scanner from Cycle 13; now index
+  only the =items= section of each enum YAML, not nested metadata.
+
+* Native YAML member model
+
+- Recognized top-level engine reference sections only, deliberately ignoring
+  nested parameters as independent API members.
+- Source locations, first summary lines, declared property types, parameter
+  types, result types and deprecated tags; on-demand cache with refresh.
+- Full Dired-style member index and native minibuffer completion with semantic
+  grouping and affixation. No mandatory Consult, Vertico or Corfu dependency.
+- Jump to Markdown heading when local documentation exists, otherwise use
+  configured live Roblox documentation browser (EWW by default).
+- Source-file command jumps to the exact YAML declaration line.
+- New =C-c C-b= source-buffer prefix for API browsing, searching, members,
+  documentation, explicit web fallback, refresh, and custom root.
+- Source-buffer setup now installs local API CAPF / Corfu margin formatter.
+- Native doc heading picker no longer destroys its own completion alist.
+
+* Tests and validation
+
+Nine new native ERT cases cover parser fidelity, cache refresh, source-browser
+rows, completion metadata, frontend text-property stripping, document jump,
+web fallback, mode initialization and heading navigation. Existing interface
+and Flymake expectations are updated from the diagnostic bundle.
+
+Python tooling tests, static checks, package audit and package TAR creation
+passed in the generation environment. The environment lacks Emacs; therefore
+strict byte compilation, Checkdoc, package-lint and all ERT behavior must be
+verified by the user's next =make check= report. Do not call this cycle green
+until the native checks are confirmed locally.
+
+* Next cycle
+
+Fix any remaining local =make check= failures before expanding features.
+Then prioritize contextual instance member completions without inventing type
+information, native member documentation deep links, inherited class members,
+security/deprecation indicators, and completions tailored to local enums.

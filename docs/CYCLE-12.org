@@ -1,0 +1,50 @@
+#+title: Luau Mode Cycle 12 — Native API UX and offline asset integration
+
+* Scope
+
+Strict incremental delta over the user's locally green uploaded
+=luau-mode.tar.gz= baseline. No old cycle files are included.
+
+* Configurable asset root
+
+#+begin_src emacs-lisp
+(setq luau-browser-assets-root "/home/l/xos/projects/bloblox/first/docs")
+#+end_src
+
+This is a standard customizable variable; the example location is not
+compiled into package code. The root contains =roblox-creator-docs/= and
+=engine-reference-svg-icons/=. Missing SVGs fall back to text, and no
+network fetch is performed during editing.
+
+* Implementation
+
+- Prefer YAML as canonical engine API structure when a matching Markdown
+  sibling exists. Retain standalone Markdown references.
+- Render a native read-only structural API overview for YAML references,
+  combining its constructors/properties/methods/events/callbacks/functions
+  with a same-stem Markdown companion when one exists.
+- Extract the first nonempty YAML block-scalar summary line for clean
+  completion annotations and Dired-like listing.
+- Cache local SVG path lookup by root and kind, instead of recursively
+  searching the icon collection for each completion candidate.
+- Cache parsed enum members using file identity (path, mtime, size), and
+  invalidate both caches on explicit index refresh.
+- Add browser navigation j/k, source view v, symbol copy c, qualified
+  copy C, local bindings help h. Document buffers gain j/k/h/v.
+- Keep completion on standard completing-read/CAPF to support Vertico,
+  Consult and Corfu without imposing global configuration.
+- Add ERT regression tests for YAML/Markdown pairing, customizable root
+  invalidation, enum cache invalidation, and mode-local keymaps.
+
+* Canonical local verification
+
+Run =make check= in the project after applying the delta. Provide the
+resulting diagnostic bundle with the output. This build environment does
+not contain an Emacs executable; no claim of a locally passing check is made.
+
+* Next cycle
+
+Implement richer YAML member details and signatures (parameters, return
+values, security/deprecation), precise per-member navigation and LSP
+cross-reference links, and shared icon decoration for CAPF and minibuffer
+completion with concrete integration tests.

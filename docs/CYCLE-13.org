@@ -1,0 +1,55 @@
+#+title: Luau Mode Cycle 13 — Reliable Native API UX and Live Fallback
+
+* Baseline and delta contract
+
+Source is the user's uploaded =luau-mode.tar.gz= with Cycle 12 delta
+applied once. Deliver only Cycle 13's added or modified files, rooted
+at =luau-mode/=; never ship the preceding cycles again.
+
+* Diagnoses from the uploaded make check bundle
+
+- Strict compilation: =outline-toggle-children= was not known without a
+  required library; use public =outline-cycle= after =(require 'outline)=.
+- Checkdoc: quote =completion-at-point= correctly in the option docstring.
+- 8-second ERT timeout: =syntax-ppss= is allowed to move point to its argument.
+  In the Flymake scan it moved backward into the current match, allowing
+  repeated scanning indefinitely. Save the original match positions,
+  protect the syntax query with =save-excursion= and advance monotonically.
+- Package installation: the allowlisted build omitted =luau-browser.el=.
+  Include it in the release TAR and verify it loads inside an isolated
+  installed package before claiming an install smoke PASS.
+
+* Native-first and configurable online fallback
+
+- YAML is API structure, Markdown is human-readable content.
+- For symbol documentation, prefer readable local Markdown. When the
+  counterpart Markdown is absent (even if YAML exists), call the existing
+  live Creator Hub browser, EWW by default, on an explicit user action.
+- Explicit online access with =W=, automatic fallback optionally disabled
+  using =luau-browser-online-fallback=.
+- The official icon/docs root remains =luau-browser-assets-root=.
+
+* Editor integration
+
+- Sortable Dired-style list with category filter and grouped completion.
+- Native documentation outline with heading jump, folding, theme faces,
+  inline code, fenced code examples, source view and online link.
+- Corfu margin icons use the official local SVG where available. The public
+  formatter protocol is installed buffer-locally and leaves unrelated
+  completion categories and user global settings untouched.
+- CAPF metadata also provides enum type-member completion and documentation
+  buffers for existing Corfu popup-info integrations, no extra dependency.
+- All features have headless ERT fixtures which never require a network.
+
+* Validation
+
+Run =make check= after extracting over the user's cumulative installation.
+This environment has no Emacs executable, so native ERT, strict byte compile,
+Checkdoc and package-lint must be verified against the next local report.
+Python tooling, source static checks, and the package audit are run here.
+
+* Next cycle
+
+Implement per-member YAML metadata (inheritance, API changes, signatures,
+security/deprecation, type constraints) and clickable native links to
+relevant documentation sections with more ERT and benchmark coverage.

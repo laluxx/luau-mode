@@ -30,7 +30,16 @@
 
 (defconst luau-roblox-test--declarations
   (concat "-- Roblox API test definition fixture\n"
-          "declare Vector3: {new: (number, number, number) -> Vector3}\n"
+          "declare extern type Vector3 with\n"
+          "\tMagnitude: number\n"
+          "end\n"
+          "declare Other: {\n"
+          "\tnew: (number) -> Other,\n"
+          "}\n"
+          "declare Vector3: {\n"
+          "\tzero: Vector3,\n"
+          "\tnew: (number, number, number) -> Vector3,\n"
+          "}\n"
           "export type Camera = {CFrame: CFrame}\n"))
 
 (defconst luau-roblox-test--documentation
@@ -51,6 +60,35 @@
   (should (commandp 'luau-roblox-api-status))
   (should (eq (lookup-key luau-mode-map (kbd "C-c C-u"))
               'luau-roblox-api-status)))
+
+(ert-deftest luau-roblox-test-definition-navigates-api-symbol-and-member ()
+  "Definition navigation targets the Roblox API type or exact member."
+  (let* ((luau-roblox-api-source 'cached)
+         (luau-roblox-api-definition-override nil)
+         (luau-roblox-api-cache-directory
+          (make-temp-file "luau-api-definition-test-" t))
+         (definition (luau-roblox-api-definition-path))
+         (source (generate-new-buffer " *Luau API definition source*")))
+    (unwind-protect
+        (progn
+          (with-temp-file definition
+            (insert luau-roblox-test--declarations))
+          (with-current-buffer source
+            (insert "local value = Vector3.new(1, 2, 3)\n")
+            (luau-mode))
+          (dolist (case '(("Vector3" . "declare extern type Vector3 with")
+                          ("new" . "\tnew:")))
+            (with-current-buffer source
+              (goto-char (point-min))
+              (search-forward (car case))
+              (backward-word)
+              (luau-roblox-find-definition)
+              (should (equal (buffer-file-name) definition))
+              (should (looking-at (regexp-quote (cdr case)))))))
+      (when (buffer-live-p source) (kill-buffer source))
+      (when-let* ((api-buffer (get-file-buffer definition)))
+        (kill-buffer api-buffer))
+      (delete-directory luau-roblox-api-cache-directory t))))
 
 (ert-deftest luau-roblox-test-mode-never-downloads ()
   "Opening a Luau buffer must never contact the Roblox API endpoint."

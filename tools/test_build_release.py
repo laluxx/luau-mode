@@ -38,6 +38,14 @@ class ReleaseBuilderTests(unittest.TestCase):
             self.assertIn(b'(define-package "luau-mode" "0.7.0"',
                           archive.extractfile("luau-mode-0.7.0/luau-mode-pkg.el").read())
 
+    def test_native_browser_is_a_required_package_module(self):
+        """The local-first documentation browser must ship with the major mode."""
+        self.assertIn("luau-browser.el", MODULES)
+        archive = build(self.root)
+        with tarfile.open(archive) as bundle:
+            self.assertIsNotNone(
+                bundle.extractfile("luau-mode-0.7.0/luau-browser.el"))
+
     def test_descriptor_avoids_spurious_native_compiler_warnings(self):
         """Mark the required package descriptor as non-compilable metadata."""
         output = build(self.root)
@@ -70,9 +78,15 @@ class ReleaseBuilderTests(unittest.TestCase):
 
     def test_missing_module_fails_closed(self):
         """Reject a partial distribution before invoking Emacs."""
-        (self.root / "luau-lsp.el").unlink()
-        with self.assertRaisesRegex(ReleaseError, "luau-lsp.el"):
-            build(self.root)
+        for module in ("luau-lsp.el", "luau-browser.el"):
+            with self.subTest(module=module):
+                with tempfile.TemporaryDirectory() as directory:
+                    import shutil
+                    for item in (*MODULES, *DATA):
+                        shutil.copy2(self.root / item, Path(directory) / item)
+                    (Path(directory) / module).unlink()
+                    with self.assertRaisesRegex(ReleaseError, module):
+                        build(Path(directory))
 
     def test_symlink_module_fails_closed(self):
         """Never silently ship content through a distribution symlink."""

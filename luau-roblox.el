@@ -18,10 +18,13 @@
 (require 'cl-lib)
 (require 'subr-x)
 (require 'json)
+(require 'xref)
 (autoload 'eww "eww" "Display a URL in an Emacs web buffer." t)
 
 (declare-function url-retrieve-synchronously "url" (url &optional silent inhibit-cookies timeout))
+(declare-function lsp-ui-peek-find-definitions "lsp-ui-peek" (&optional extra))
 (defvar url-http-response-status)
+(defvar luau-lsp-auto-start)
 
 (defgroup luau-roblox nil
   "Roblox API declarations and documentation used by Luau LSP."
@@ -148,6 +151,112 @@ The result is empty if server-bundled declarations are selected."
     (append (list (format "--definitions:@roblox=%s" definitions))
             (when-let* ((docs (luau-roblox--selected-documentation definitions)))
               (list (concat "--docs=" docs))))))
+
+(defun luau-roblox--definition-target-at-point ()
+  "Return the API owner and optional member under point.
+For `Vector3.new', return owner `Vector3' and member `new' when point
+is on NEW; return `Vector3' with no member when point is on the type.
+Return nil inside comments or strings."
+  (let* ((state (syntax-ppss))
+         (symbol (thing-at-point 'symbol t))
+         (begin (and symbol
+                     (save-excursion
+                       (skip-syntax-backward "w_")
+                       (point)))))
+    (when (and symbol (not (nth 8 state)))
+      (let ((owner
+             (save-excursion
+               (goto-char begin)
+               (when (eq (char-before) ?.)
+                 (backward-char)
+                 (skip-syntax-backward "w_")
+                 (thing-at-point 'symbol t)))))
+        (cons (or owner symbol) (and owner symbol))))))
+
+(defun luau-roblox--declaration-regexp (name)
+  "Return a regexp matching the top-level declaration for NAME."
+  (concat "^[ \t]*\\(?:declare[ \t]+\\(?:extern[ \t]+\\)?"
+          "\\(?:class[ \t]+\\|type[ \t]+\\|function[ \t]+\\)?"
+          "\\|export[ \t]+type[ \t]+\\|type[ \t]+\\|class[ \t]+\\|function[ \t]+\\)"
+          (regexp-quote name) "\\_>"))
+
+(defun luau-roblox--definition-position (buffer name member)
+  "Find NAME or MEMBER's definition position in BUFFER.
+MEMBER is searched only inside NAME's top-level declaration."
+  (with-current-buffer buffer
+    (save-excursion
+      (let ((declaration-regexp (luau-roblox--declaration-regexp name))
+            (top-level-regexp
+             "^\\(?:declare\\|export[ \t]+type\\|type\\|class\\|function\\)[ \t]+")
+            (member-regexp (and member
+                                (concat "^[ \t]+" (regexp-quote member)
+                                        "[ \t]*:")))
+            found)
+        (goto-char (point-min))
+        (while (and (not found)
+                    (re-search-forward declaration-regexp nil t))
+          (let* ((declaration-start (line-beginning-position))
+                 (declaration-end
+                  (save-excursion
+                    (goto-char declaration-start)
+                    (forward-line 1)
+                    (if (re-search-forward top-level-regexp nil t)
+                        (line-beginning-position)
+                      (point-max)))))
+            (if member
+                (progn
+                  (goto-char declaration-start)
+                  (when (re-search-forward member-regexp declaration-end t)
+                    (setq found (line-beginning-position)))
+                  (goto-char declaration-end))
+              (setq found declaration-start))))
+        found))))
+
+(defun luau-roblox--visit-api-definition (file name member)
+  "Visit FILE's declaration for NAME and optional MEMBER.
+Return non-nil when a local declaration was found."
+  (let* ((existing-buffer (get-file-buffer file))
+         (buffer (let ((luau-lsp-auto-start nil))
+                   (condition-case nil
+                       (find-file-noselect file)
+                     (file-error nil))))
+         (position (and buffer
+                        (luau-roblox--definition-position
+                         buffer name member))))
+    (if position
+        (progn
+          (xref-push-marker-stack)
+          (switch-to-buffer buffer)
+          (goto-char position)
+          t)
+      (when (and buffer (not existing-buffer) (buffer-live-p buffer))
+        (kill-buffer buffer))
+      nil)))
+
+(defun luau-roblox--lsp-find-definition ()
+  "Run the standard LSP definition command."
+  (if (or (fboundp 'lsp-ui-peek-find-definitions)
+          (require 'lsp-ui-peek nil t))
+      (call-interactively #'lsp-ui-peek-find-definitions)
+    (call-interactively #'xref-find-definitions)))
+
+;;;###autoload
+(defun luau-roblox-find-definition ()
+  "Jump to a local Roblox API declaration, or use the active LSP.
+The selected Roblox definitions file is searched first.  If the symbol or
+member is not declared there, fall back to `lsp-ui-peek-find-definitions'
+when available, otherwise `xref-find-definitions'."
+  (interactive)
+  (let* ((target (luau-roblox--definition-target-at-point))
+         (definition
+          (and target
+               (condition-case nil
+                   (luau-roblox--selected-definition)
+                 (user-error nil)))))
+    (unless (and definition
+                 (luau-roblox--visit-api-definition
+                  definition (car target) (cdr target)))
+      (luau-roblox--lsp-find-definition))))
 
 (defun luau-roblox--download-asset (url destination kind)
   "Download URL atomically to DESTINATION, validating its KIND.

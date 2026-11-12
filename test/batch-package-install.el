@@ -36,7 +36,7 @@
           ;; package-install-file normally activates the new package.  The
           ;; explicit activation also detects missing dependency metadata.
           (package-activate 'luau-mode)
-          (dolist (module '("luau-mode" "luau-lsp" "luau-roblox" "luau-make" "luau-interface"))
+          (dolist (module '("luau-mode" "luau-lsp" "luau-roblox" "luau-make" "luau-interface" "luau-browser"))
             (let ((location (locate-library module)))
               (unless (and location (file-in-directory-p location package-user-dir))
                 (error "Module %s escaped installed package dir: %S"
@@ -53,6 +53,10 @@
           (require 'luau-mode)
           (unless (fboundp 'luau-imenu)
             (error "Installed package did not export Luau Imenu"))
+          (unless (and (fboundp 'luau-browser)
+                       (eq (lookup-key luau-mode-map (kbd "C-c C-o"))
+                           'luau-browser-at-point))
+            (error "Installed package did not export native API documentation"))
           (let ((luau-lsp-auto-start nil))
             (with-temp-buffer
               (insert "--!strict\nlocal v: Vector3 = Vector3.new(1, 2, 3)\n")

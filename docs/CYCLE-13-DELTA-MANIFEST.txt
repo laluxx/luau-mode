@@ -1,0 +1,13 @@
+Cycle 13 strict incremental delta / luau-mode/
+Baseline: user-uploaded luau-mode.tar.gz + Cycle 12 strict delta
+No build outputs, installed documentation assets, historical files or unchanged files.
+
+# STATUS  SHA256  ARCHIVE_MEMBER
+MODIFIED 4456f809b4ac83af25a18c5dd238a8fbdc39e181d8768768205e76bf796fd223 luau-mode/luau-browser.el
+MODIFIED c831775cc9bb4aabefdcb006bee69e35766e55ac3de046e67073d1ae5da1ea13 luau-mode/luau-mode.el
+MODIFIED af1a406694a40fd9a7866aea56a6794babfe73dfd92b6ef79477b456aeb096c1 luau-mode/README.md
+MODIFIED dbf4569427167a0d39d7a997da2313a204261d3ab5291571420c58fc4fd1e4f0 luau-mode/test/batch-package-install.el
+MODIFIED 5e3939511f4cf7e0f5d82d11d9998ff3ca7efd21611c78d80bee3ae6fc5989ea luau-mode/test/luau-browser-test.el
+MODIFIED c4d792cccc4a172a14aa817acf4a9524eb9e24fd1ee10ebeb9532a39af9c6ea0 luau-mode/tools/build_release.py
+MODIFIED 6c4629c9a2138f1bb409e03b13db7f7fb18d1c4d1fb8f1b222b59316ea310077 luau-mode/tools/test_build_release.py
+ADDED 7020cdfcc1d6428482f69b99df820b0f192ced34e50198ba64c8e9a5d35d010d luau-mode/docs/CYCLE-13.org

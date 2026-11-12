@@ -1,0 +1,11 @@
+Cycle 14 strict incremental delta rooted at luau-mode/
+Baseline: uploaded Cycle 13 source fingerprints; no historical snapshot.
+No build products, local docs/icons, Python bytecode or unchanged files.
+
+# STATUS  SHA256  ARCHIVE_MEMBER
+MODIFIED faff4b5216cb421d1ff6de2ee61893b077d668e60ba87c5a233c7c791ea4b71f luau-mode/README.md
+ADDED d69e070612c156fa80023e2532ad11b14acb19c00d54487366349b691a8413a6 luau-mode/docs/CYCLE-14.org
+MODIFIED edb0d4b3ea951124ad867232a2e3b8a9b47d7216cba98ebdab4fc27ca1663e61 luau-mode/luau-browser.el
+MODIFIED e9ca61fcb1ddc28d8e885590c58d5a9eb37f90643ffcfd59d42f3887c592eafd luau-mode/luau-mode.el
+MODIFIED 57a6ff1bfc3e5060808964db7e060ec26dacb9aaf62ca4454d6a8dd1ece2d2f7 luau-mode/test/luau-browser-test.el
+MODIFIED 051462bf46b795e64cafb83b96c5b2a1ec9572e58b787457ec7cebe5bb907548 luau-mode/test/luau-interface-test.el
